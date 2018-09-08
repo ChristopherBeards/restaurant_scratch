@@ -115,5 +115,32 @@ router.post('/login', (req, res) => {
 }
 */
 
+// @route   GET api/employees/current
+// @desc    Return current employee
+// @access  Private
+router.get(
+  '/current',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    console.log(req.user);
+    res.json({
+      id: req.user.id,
+      pin: req.user.pin,
+      status: req.user.status,
+    });
+  },
+);
+
+/* Returns
+{
+    "id": "5b9406933a8e0caaa4254739",
+    "pin": "0000",
+    "status": {
+        "admin": true,
+        "manager": null
+    }
+}
+*/
+
 // Export Router
 module.exports = router;
