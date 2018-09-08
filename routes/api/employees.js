@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const keys = require('../../config/keys');
+const passport = require('passport');
 
 // Require Employee Model
 const Employee = require('../../models/Employee');
@@ -76,7 +79,26 @@ router.post('/login', (req, res) => {
         // Check the password on the model
         employee.checkPassword(password).then(verified => {
           if (verified) {
-            res.status(200).json({ message: 'success!', employee: employee });
+            const payload = {
+              id: employee._id,
+              pin: employee.pin,
+              status: {
+                admin: employee.status.admin,
+                manager: employee.status.manager,
+              },
+            };
+
+            jwt.sign(
+              payload,
+              keys.secretOrKey,
+              { expiresIn: '1d' },
+              (err, token) => {
+                res.json({
+                  success: true,
+                  token: 'Bearer ' + token,
+                });
+              },
+            );
           }
         });
       }
@@ -85,6 +107,13 @@ router.post('/login', (req, res) => {
       res.status(400).json({ message: 'Something went wrong!', error: err });
     });
 });
+
+/* Returns
+{
+    "success": true,
+    "token": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjViOTQwNjkzM2E4ZTBjYWFhNDI1NDczOSIsInBpbiI6IjAwMDAiLCJzdGF0dXMiOnsiYWRtaW4iOnRydWUsIm1hbmFnZXIiOm51bGx9LCJpYXQiOjE1MzY0MzIzMzIsImV4cCI6MTUzNjUxODczMn0.Ie6EbuPnaBzVxnj39rXU_4w-xycGlHytgEMNPPzi2ZA"
+}
+*/
 
 // Export Router
 module.exports = router;

@@ -2,18 +2,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 
-// Initialize express variable
+// * Load Employee Routes
+const employees = require('./routes/api/employees');
+
+// Initialize express
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-// Port
-const PORT = process.env.PORT || 5000;
-
-// Load Employee Model
-const employees = require('./routes/api/employees');
 
 //===================================
 //         Connect to MongoDB
@@ -28,14 +25,19 @@ mongoose
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
+// Initialize Passport
+app.use(passport.initialize());
+// Passes passport to passport.js
+require('./config/passport.js')(passport);
+
 //===================================
-//             Listening
+//              Server
 //===================================
+const PORT = process.env.PORT || 5000;
+
+// Routes
+app.use('/api/employees', employees);
+
 app.listen(PORT, () => {
   console.log(`Server running on port: ${PORT}`);
 });
-
-//===================================
-//             Routes
-//===================================
-app.use('/api/employees', employees);
