@@ -3,14 +3,15 @@ const Schema = mongoose.Schema;
 const bcrypt = require('bcryptjs');
 
 // Create Schema
-const EmployeeSchema = new Schema({
+const Employee = new Schema({
   name: {
     type: String,
     required: true,
   },
   pin: {
-    type: Number,
+    type: String,
     required: true,
+    min: 4,
   },
   password: {
     type: String,
@@ -33,8 +34,8 @@ const EmployeeSchema = new Schema({
   },
 });
 
-// Pre-Save Hooks
-EmployeeSchema.pre('save', function(next) {
+// Pre-Save Hook
+Employee.pre('save', function(next) {
   if (!this.isModified('password')) return next();
   bcrypt.hash(this.password, 11, (err, hash) => {
     if (err) return next(err);
@@ -43,8 +44,9 @@ EmployeeSchema.pre('save', function(next) {
   });
 });
 
-EmployeeSchema.checkPassword = providedPass => {
-  return bcrypr.compare(providedPass, this.password);
+// Why no use arrow functions again??
+Employee.methods.checkPassword = function(providedPass) {
+  return bcrypt.compare(providedPass, this.password);
 };
 
-module.exports = Employee = mongoose.model('Employee', EmployeeSchema);
+module.exports = mongoose.model('Employee', Employee);

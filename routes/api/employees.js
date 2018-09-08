@@ -12,6 +12,79 @@ router.get('/test', (req, res) => res.json({ msg: 'Employee Routes Work' }));
 // @route   POST api/employees/register
 // @desc    Register an employee
 // @access  Public
-// Export Router
+router.post('/register', (req, res) => {
+  // create the employee
+  Employee.findOne({ pin: req.body.pin }).then(employee => {
+    if (employee) {
+      return res.status(400).json({ error: 'Employee already registered!' });
+    } else {
+      const newEmployee = new Employee({
+        name: req.body.name,
+        pin: req.body.pin,
+        password: req.body.password,
+        status: {
+          admin: req.body.status === 'admin' ? true : null,
+          manager: req.body.status === 'manager' ? true : null,
+        },
+      });
 
+      // save the employee
+      newEmployee
+        .save()
+        .then(employee => {
+          res.status(200).json(employee);
+        })
+        .catch(err => {
+          res.status(400).json({
+            message: 'There was an error creating a new employee',
+            error: err,
+          });
+        });
+    }
+  });
+});
+
+/* RETURNS
+{
+    "status": {
+        "admin": true,
+        "manager": null
+    },
+    "_id": "5b9406933a8e0caaa4254739",
+    "name": "admin",
+    "pin": "0000",
+    "password": "$2a$11$xiT9ACNt3sWyCoChsGiGUO/l/VjHpqG1/nkdeh7imxVCshmLueoba",
+    "__v": 0
+}
+*/
+
+// @route   GET api/employees/login
+// @desc    Login Employee / Returning JWT Token
+// @access  Public
+router.post('/login', (req, res) => {
+  // Pull off the pin and password from login
+  const { pin, password } = req.body;
+
+  // Find the employee
+  Employee.findOne({ pin })
+    .then(employee => {
+      if (!employee) {
+        return res
+          .status(404)
+          .json({ error: 'No employee by that pin exists!' });
+      } else {
+        // Check the password on the model
+        employee.checkPassword(password).then(verified => {
+          if (verified) {
+            res.status(200).json({ message: 'success!', employee: employee });
+          }
+        });
+      }
+    })
+    .catch(err => {
+      res.status(400).json({ message: 'Something went wrong!', error: err });
+    });
+});
+
+// Export Router
 module.exports = router;
