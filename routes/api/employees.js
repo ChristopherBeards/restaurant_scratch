@@ -9,5 +9,9 @@ const Employee = require('../../models/Employee');
 // @access  Public
 router.get('/test', (req, res) => res.json({ msg: 'Employee Routes Work' }));
 
+// @route   POST api/employees/register
+// @desc    Register an employee
+// @access  Public
 // Export Router
+
 module.exports = router;
