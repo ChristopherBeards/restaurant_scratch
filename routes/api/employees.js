@@ -122,7 +122,6 @@ router.get(
   '/current',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    console.log(req.user);
     res.json({
       id: req.user.id,
       pin: req.user.pin,
@@ -140,6 +139,43 @@ router.get(
         "manager": null
     }
 }
+*/
+
+// @route   GET api/employees/all
+// @desc    Return all registered employees
+// @access  Private
+router.get(
+  '/all',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    if (req.user.status.admin || req.user.status.manager) {
+      Employee.find({})
+        .then(users => {
+          res.status(200).json(users);
+        })
+        .catch(err => {
+          res.status(404).json({ message: 'No employees found!', error: err });
+        });
+    } else {
+      res.status(401).json({ err: 'Not authorized!' });
+    }
+  },
+);
+
+/* Returns
+[
+    {
+        "status": {
+            "admin": true,
+            "manager": null
+        },
+        "_id": "5b9406933a8e0caaa4254739",
+        "name": "admin",
+        "pin": "0000",
+        "password": "$2a$11$xiT9ACNt3sWyCoChsGiGUO/l/VjHpqG1/nkdeh7imxVCshmLueoba",
+        "__v": 0
+    }
+]
 */
 
 // Export Router
