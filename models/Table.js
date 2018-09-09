@@ -6,6 +6,7 @@ const Table = new Schema({
   number: {
     type: Number,
     required: true,
+    max: 6,
   },
   server: [
     {
