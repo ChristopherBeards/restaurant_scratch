@@ -5,6 +5,7 @@ const passport = require('passport');
 // * Load Employee Routes
 const employees = require('./routes/api/employees');
 const items = require('./routes/api/items');
+const tables = require('./routes/api/tables');
 
 // Initialize express
 const app = express();
@@ -39,6 +40,7 @@ const PORT = process.env.PORT || 5000;
 // Routes
 app.use('/api/employees', employees);
 app.use('/api/items', items);
+app.use('/api/tables', tables);
 
 app.listen(PORT, () => {
   console.log(`Server running on port: ${PORT}`);
