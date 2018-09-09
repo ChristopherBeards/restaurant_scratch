@@ -4,6 +4,12 @@ const bcrypt = require('bcryptjs');
 
 // Create Schema
 const Employee = new Schema({
+  tables: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'tables',
+    },
+  ],
   name: {
     type: String,
     required: true,

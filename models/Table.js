@@ -3,25 +3,19 @@ const Schema = mongoose.Schema;
 
 // Create Schema
 const Table = new Schema({
+  server: {
+    type: Schema.Types.ObjectId,
+    ref: 'Employee',
+  },
   number: {
     type: Number,
     required: true,
     max: 6,
   },
-  server: [
-    {
-      employee: {
-        type: Schema.Types.ObjectId,
-        ref: 'employees',
-      },
-    },
-  ],
   food: [
     {
-      item: {
-        type: Schema.Types.ObjectId,
-        ref: 'items',
-      },
+      type: Schema.Types.ObjectId,
+      ref: 'Item',
     },
   ],
 });
