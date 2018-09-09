@@ -48,5 +48,48 @@ router.post(
 }
 */
 
+// @route   POST api/tables/update
+// @desc    Update a table with data
+// @access  Private
+router.post(
+  '/update',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const { tableId, employeeId, food } = req.body;
+    Table.findByIdAndUpdate({ _id: tableId })
+      .then(table => {
+        // Add data to our table
+        table.server.push({ _id: employeeId });
+        table.food.push(...food);
+
+        // Save the updated table
+        table.save().then(table => {
+          res.status(200).json(table);
+        });
+      })
+      .catch(err => {
+        res.status(400).json({ message: 'Something went wrong!', err: err });
+      });
+  },
+);
+
+/* Returns
+{
+    "_id": "5b952933be259baafcc5bcaf",
+    "number": 0,
+    "server": [
+        {
+            "_id": "5b9406933a8e0caaa4254739"
+        }
+    ],
+    "food": [
+        {
+            "_id": "5b954277f43e07a0986a866a"
+        }
+    ],
+    "__v": 2
+}
+*/
+
 // Export Router
 module.exports = router;
